@@ -1,0 +1,44 @@
+# --- SEGURIDAD CRÍTICA (Bloquear sí o sí) ---
+.ssh/
+.gnupg/
+.pki/
+id_rsa
+id_ed25519
+*.pem
+*.key
+
+# --- Historiales de Shell (A veces contienen contraseñas) ---
+.bash_history
+.zsh_history
+.fish_history
+.python_history
+.mysql_history
+
+# --- Carpetas "Basura" o Pesadas del Sistema ---
+.cache/
+.local/share/Trash/
+.mozilla
+.ndless
+Desktop/
+Documents/
+Downloads/
+go/
+Music/
+Ndless/
+Pictures/
+Public/
+Templates/
+Videos/
+
+# --- Archivos de Sistema y Temporales ---
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.bak
+*.tmp
+
+# --- Configs específicas que NO quieres subir ---
+# Por ejemplo, credenciales de AWS o Docker
+.aws/
+.docker/
