@@ -4,54 +4,31 @@
 	"position": "top",
 	"height": 25,
 	"spacing": 0,
-	"output": "eDP-1",
+	"output": "HDMI-A-4",
 	"modules-left": [
-		"hyprland/workspaces",
-		"hyprland/submap"
+		"hyprland/window",
+		"custom/spaaaaace"
 	],
-	"modules-center": ["mpris"],
+	"modules-center": ["custom/mpris"],
 	"modules-right": [
 		"custom/audio",
+		"custom/spacer",
 		"network",
-		"battery",
-		"clock",
-		"power-profiles-daemon"
+		"custom/spacer",
+		"clock"
+		//"custom/spacer",
+		//"power-profiles-daemon"
 	],
-	"hyprland/language":{
-		"format": "{}",
-		"format-en": "EN",
-		"format-es": "ES"
+	"custom/spaaaaace": { // 5 'a'
+		"exec": "echo ' '"
 	},
-	"hyprland/workspaces": {
-		"active-only": false,
-		"all-outputs": true,
-		"show-special": false,
-		"warp-on-scroll": true,
-		"format": "{icon}",
-		"on-scroll-up": "hyprctl dispatch workspace e-1",
-		"on-scroll-down": "hyprctl dispatch workspace e+1",
-		"format-icons": {
-			"1": "󰣇",
-			"2": "",
-			"3": "",
-			"4": "",
-			"5": "",
-			"6": "",
-			"7": "",
-			"8": "",
-			"9": "",
-			"10": "",
-			"music": "󰽴",
-			"urgent": "",
-			"focused": "󰼀"
-		},
-        	"persistent-workspaces": {
-            	"*": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        	}
+	"custom/spacer": {
+		"format": "|",
+		"tooltip": false
 	},
 	"custom/audio": {
 		"exec": "$HOME/.scripts/sound/get-volume.sh",
-		"on-click": "kitty alsamixer",
+		"enable-bar-scroll": true,
 		"on-scrol-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
 		"on-scrol-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%",
 		"on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
@@ -73,19 +50,11 @@
 		"format-disconnected": "⚠",
 		"format-alt": "{ifname}: {ipddr}/{cidr}"
 	},
-	"mpris": {
-		"dynamic-order": ["title", "album"],
-		"format": "{player_icon}  {dynamic}",
-		"max-length": 55,
-		"format-scroll": true,
-		"format-paused": "{status_icon}  {dynamic}",
-		"player-icons": {
-			"default": "󰏦",
-			"mpv": "🎵"
-		},
-		"status-icons": {
-			"paused": "󰐍"
-		}
+	"custom/mpris": {
+		"exec": "python3 -u $HOME/.scripts/music/scrolling-mpris.py",
+		"format": "{text}",
+		"return-type": "json",
+		"on-click": "playerctl play-pause"
 	},
 	"battery": {
 		"interval": 60,
