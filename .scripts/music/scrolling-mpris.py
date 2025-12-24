@@ -6,10 +6,10 @@ import sys
 GLYPHS = {
     "paused": "",
     "playing": "",
-    "stopped": ""
+    "stopped": " "
 }
 DEFAULT_GLYPH = ""  # Glyph when status is unknown or default
-TEXT_WHEN_STOPPED = "Nothing playing right now"  # Text to display when nothing is playing
+TEXT_WHEN_STOPPED = "..."  # Text to display when nothing is playing
 SCROLL_TEXT_LENGTH = 70  # Length of the song title part (excludes glyph and space)
 REFRESH_INTERVAL = 0.4  # How often the script updates (in seconds)
 PLAYERCTL_PATH = "/usr/bin/playerctl" # Path to playerctl, use which playerctl to find yours.
@@ -32,7 +32,7 @@ def get_current_song():
         song_title = result.stdout.decode('utf-8').strip()
         if result.returncode != 0 or not song_title:
             return None  # Return None if no song is playing or an error occurred
-        return song_title + '      '
+        return [song_title + '      ', 1] if len(song_title) > 70 else [song_title, 0]
     except Exception as e:
         return None
 
@@ -40,41 +40,45 @@ def get_current_song():
 def scroll_text(text, length=SCROLL_TEXT_LENGTH):
     text = text.ljust(length)  # Ensure the text is padded to the desired length
     scrolling_text = text + ' ' + text[:length]  # Add space and repeat start for scrolling effect
-    
+
     for i in range(len(scrolling_text) - length):
         yield scrolling_text[i:i + length]  # Use a generator to yield scrolling parts
 
 if __name__ == "__main__":
     scroll_generator = None
-    
+
     while True:
         output = {}
-        
+
         try:
             # Get the player status and song title
             status = get_player_status()
-            song = get_current_song()
+            song, scroll = get_current_song()
 
             # Get the glyph based on player status
             glyph = GLYPHS.get(status, DEFAULT_GLYPH)
 
-            if song:
-                if len(song) > SCROLL_TEXT_LENGTH:  # Adjusted for fixed glyph space
-                    if scroll_generator is None:
-                        scroll_generator = scroll_text(song)  # Initialize the generator
-                    try:
-                        song_text = next(scroll_generator)
-                    except StopIteration:
-                        scroll_generator = scroll_text(song)
-                        song_text = next(scroll_generator)
+            if scroll:
+                if song:
+                    if len(song) > SCROLL_TEXT_LENGTH:  # Adjusted for fixed glyph space
+                        if scroll_generator is None:
+                            scroll_generator = scroll_text(song)  # Initialize the generator
+                        try:
+                            song_text = next(scroll_generator)
+                        except StopIteration:
+                            scroll_generator = scroll_text(song)
+                            song_text = next(scroll_generator)
+                    else:
+                        song_text = song.ljust(SCROLL_TEXT_LENGTH)  # Ensure the song title is padded
+                        scroll_generator = None
                 else:
-                    song_text = song.ljust(SCROLL_TEXT_LENGTH)  # Ensure the song title is padded
-                    scroll_generator = None
-            else:
-                song_text = TEXT_WHEN_STOPPED.ljust(SCROLL_TEXT_LENGTH)  # Ensure fixed length when stopped
+                    song_text = TEXT_WHEN_STOPPED.ljust(SCROLL_TEXT_LENGTH)  # Ensure fixed length when stopped
 
-            # Combine glyph and song text with a fixed space
-            output['text'] = f"{glyph} {song_text}"
+                # Combine glyph and song text with a fixed space
+                output['text'] = f"{glyph} {song_text}"
+
+            else:
+                output['text'] = f"{glyph} {song}"
 
         except Exception as e:
             output['text'] = f" Error: {str(e)}".ljust(SCROLL_TEXT_LENGTH + 2)  # Show error with stop symbol
@@ -83,4 +87,3 @@ if __name__ == "__main__":
         print(json.dumps(output), end='\n')
 
         time.sleep(REFRESH_INTERVAL)
-
