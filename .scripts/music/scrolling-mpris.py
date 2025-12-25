@@ -31,7 +31,7 @@ def get_current_song():
         result = subprocess.run([PLAYERCTL_PATH, 'metadata', 'title'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         song_title = result.stdout.decode('utf-8').strip()
         if result.returncode != 0 or not song_title:
-            return None  # Return None if no song is playing or an error occurred
+            return [TEXT_WHEN_STOPPED, 0]  # Return None if no song is playing or an error occurred
         return [song_title + '      ', 1] if len(song_title) > 70 else [song_title, 0]
     except Exception as e:
         return None
@@ -46,6 +46,7 @@ def scroll_text(text, length=SCROLL_TEXT_LENGTH):
 
 if __name__ == "__main__":
     scroll_generator = None
+    salir = 0
 
     while True:
         output = {}
@@ -71,8 +72,6 @@ if __name__ == "__main__":
                     else:
                         song_text = song.ljust(SCROLL_TEXT_LENGTH)  # Ensure the song title is padded
                         scroll_generator = None
-                else:
-                    song_text = TEXT_WHEN_STOPPED.ljust(SCROLL_TEXT_LENGTH)  # Ensure fixed length when stopped
 
                 # Combine glyph and song text with a fixed space
                 output['text'] = f"{glyph} {song_text}"
