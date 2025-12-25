@@ -6,7 +6,7 @@ import sys
 GLYPHS = {
     "paused": "",
     "playing": "",
-    "stopped": " "
+    "stopped": ""
 }
 DEFAULT_GLYPH = ""  # Glyph when status is unknown or default
 TEXT_WHEN_STOPPED = "..."  # Text to display when nothing is playing
